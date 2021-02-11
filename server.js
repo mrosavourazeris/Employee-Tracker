@@ -27,11 +27,9 @@ const startApp = [
   }
 ]
 
-const viewAllEmployees = [
-  {
-
-  }
-]
+const viewAllEmployees = () => {
+  connection.query()
+}
 
 const viewAllEmployeesByDepartment = [
   {

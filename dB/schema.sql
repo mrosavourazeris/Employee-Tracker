@@ -42,3 +42,5 @@ CREATE TABLE employee_table (
 
 
 
+SELECT * FROM employee_table;
+
