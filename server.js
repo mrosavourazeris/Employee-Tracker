@@ -1,6 +1,6 @@
 const mysql = require("mysql")
 const inquirer = require("inquirer")
-const cTable = require("console.table")
+// const cTable = require("console.table")
 
 var connection = mysql.createConnection({
     host     : 'localhost',
@@ -27,8 +27,16 @@ const startApp = [
   }
 ]
 
+
+
 const viewAllEmployees = () => {
-  connection.query()
+  connection.query(`SELECT employee.id, employee.first_name, employee.last_name, role.title, department.department, role.salary 
+  FROM employee 
+  INNER JOIN role ON employee.role_id = role.id 
+  INNER JOIN department ON role.department_id = department.id;`, (err,res) => {
+    if (err) throw err
+    console.table(res)
+  })
 }
 
 const viewAllEmployeesByDepartment = [
@@ -73,7 +81,7 @@ const employeeTracker = () => {
     // console.log(answer)
     switch(answer.action) {
       case "View All Employees":
-        // console.log("View All Employees")
+        viewAllEmployees()
         break;
       case "View All Employees By Department":
         // console.log("View All Employees By Department")
