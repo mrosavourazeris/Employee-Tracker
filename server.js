@@ -30,20 +30,30 @@ const startApp = [
 
 
 const viewAllEmployees = () => {
-  connection.query(`SELECT employee.id, employee.first_name, employee.last_name, role.title, department.department, role.salary 
-  FROM employee 
-  INNER JOIN role ON employee.role_id = role.id 
-  INNER JOIN department ON role.department_id = department.id;`, (err,res) => {
+  connection.query(`SELECT employee.id, employee.first_name, employee.last_name, role.title, department.department, role.salary FROM employee INNER JOIN role ON employee.role_id = role.id INNER JOIN department ON role.department_id = department.id;`, (err,res) => {
     if (err) throw err
     console.table(res)
+    employeeTracker()
   })
 }
 
-const viewAllEmployeesByDepartment = [
-  {
-    
-  }
-]
+const viewAllEmployeesByDepartment = () => {
+  inquirer
+    .prompt({
+      name: "department",
+      type: "input",
+      message: "Which department would you like to view?"
+    })
+    .then(function(answer) {
+      console.log(answer.department)
+      const query = `SELECT employee.id, employee.first_name, employee.last_name, role.title, department.department FROM employee INNER JOIN role ON employee.role_id = role.id INNER JOIN department ON role.department_id = department.id WHERE department.department = ?;`
+      connection.query(query, answer.department, (err,res) => {
+        if (err) throw err
+        console.table(res)
+        employeeTracker()
+      })
+    })
+}
 
 const viewAllEmployeesByManager = [
   {
@@ -84,7 +94,7 @@ const employeeTracker = () => {
         viewAllEmployees()
         break;
       case "View All Employees By Department":
-        // console.log("View All Employees By Department")
+        viewAllEmployeesByDepartment()
         break;
       case "View All Employees By Manager":
         // console.log("View All Employees By Manager")
