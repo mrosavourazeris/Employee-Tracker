@@ -1,7 +1,7 @@
-INSERT INTO department(department) VALUES ("Sales");
 INSERT INTO department (department) VALUES ("Engineering");
 INSERT INTO department(department) VALUES ("Finance");
 INSERT INTO department (department) VALUES ("Legal");
+INSERT INTO department(department) VALUES ("Sales");
 
 
 INSERT INTO role(title, salary, department_id) VALUES ("Legal Lead", 40000, 4);
