@@ -52,25 +52,7 @@ connection.query("SELECT * FROM department", (err, res) => {
     arrayOfDepartments[departmentNames[i]] = departmentIds[i];
   }
 });
-//!------------------------------------------
 
-//! Review this to better understand it 
-let roleNames;
-let roleIds;
-var arrayOfRoles = {};
-
-connection.query("SELECT * FROM role", (err, res) => {
-  if (err) throw err;
-
-  roleNames = res.map((x) => x.title);
-  roleIds = res.map((x) => x.id);
-  for (var i = 0; i < roleNames.length; i++) {
-    arrayOfRoles[roleNames[i]] = roleIds[i];
-  }
-  // console.log(roleNames, roleIds, arrayOfRoles)
-});
-
-//!------------------------------------------
 
 const viewAllEmployeesByDepartment = () => {
 
@@ -97,27 +79,30 @@ const viewAllEmployeesByDepartment = () => {
 const viewAllEmployeesByManager = [{}];
 
 
-let roleId;
-let nextRoleId;
+//!------------------------------------------
+
+//! Review this to better understand it 
+let roleNames;
+let roleIds;
+var arrayOfRoles = {};
+
 connection.query("SELECT * FROM role", (err, res) => {
   if (err) throw err;
-  roleId = res.map((x) => x.id);
-  // console.log(roleId)
 
-  nextRoleId = roleId.length + 1
-
+  roleNames = res.map((x) => x.title);
+  roleIds = res.map((x) => x.id);
+  for (var i = 0; i < roleNames.length; i++) {
+    arrayOfRoles[roleNames[i]] = roleIds[i];
+  }
+  // console.log(roleNames, roleIds, arrayOfRoles)
 });
+
+//!------------------------------------------
 
 
 const addEmployee = () => {
   inquirer
     .prompt([
-      {
-        name: "department",
-        type: "list",
-        message: "Which department does this employee belong too?",
-        choices: departmentNames
-      },
       {
         name: "title",
         type: "list",
@@ -135,30 +120,11 @@ const addEmployee = () => {
         message: "What is the employee's last name?",
       },
     ])
-    .then(({ department, title, salary, firstName, lastName }) => {
-      // console.log(typeof department)
-      // console.log(departmentId)
-      // console.log(typeof title, title)
-      // console.log(typeof salary, salary)
-      // console.log(firstName)
-      // console.log(lastName)
-      // console.log(nextRoleId)
-
-      let departmentData;
-      let departmentId = arrayOfDepartments[department];
+    .then(({title, firstName, lastName }) => {
       let roleId = arrayOfRoles[title]
-      // console.log(typeof departmentId, departmentId, "departmentId")
-     
-      // console.log(arrayOfDepartments, department)
-
-      
-      // const query1 = `INSERT INTO role(title, salary, department_id) VALUES ?`
-      const query2 = `INSERT INTO employee (first_name, last_name, role_id) VALUES ?`
+      const query1 = `INSERT INTO employee (first_name, last_name, role_id) VALUES ?`
   
-      // connection.query(query1, [[[salary, departmentId]]], (err,res) => {
-      //   if (err) throw err
-      // })
-      connection.query(query2, [[[firstName, lastName, roleId]]], (err,res) => {
+      connection.query(query1, [[[firstName, lastName, roleId]]], (err,res) => {
         if (err) throw err
         viewAllEmployees()
       })
