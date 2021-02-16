@@ -9,6 +9,40 @@ var connection = mysql.createConnection({
   database: "employees_db",
 });
 
+//! Review this to better understand it 
+let departmentNames;
+let departmentIds;
+var arrayOfDepartments = {};
+
+connection.query("SELECT * FROM department", (err, res) => {
+  if (err) throw err;
+  
+  departmentNames = res.map((x) => x.department);
+  departmentIds = res.map((x) => x.id);
+  for (var i = 0; i < departmentNames.length; i++) {
+    arrayOfDepartments[departmentNames[i]] = departmentIds[i];
+  }
+});
+
+//!------------------------------------------
+
+//! Review this to better understand it 
+let roleNames;
+let roleIds;
+var arrayOfRoles = {};
+
+connection.query("SELECT * FROM role", (err, res) => {
+  if (err) throw err;
+
+  roleNames = res.map((x) => x.title);
+  roleIds = res.map((x) => x.id);
+  for (var i = 0; i < roleNames.length; i++) {
+    arrayOfRoles[roleNames[i]] = roleIds[i];
+  }
+  // console.log(roleNames, roleIds, arrayOfRoles)
+});
+
+//!------------------------------------------
 
 const startApp = [
   {
@@ -55,20 +89,6 @@ const viewAllEmployees = () => {
   );
 };
 
-//! Review this to better understand it 
-let departmentNames;
-let departmentIds;
-var arrayOfDepartments = {};
-
-connection.query("SELECT * FROM department", (err, res) => {
-  if (err) throw err;
-
-  departmentNames = res.map((x) => x.department);
-  departmentIds = res.map((x) => x.id);
-  for (var i = 0; i < departmentNames.length; i++) {
-    arrayOfDepartments[departmentNames[i]] = departmentIds[i];
-  }
-});
 
 
 const viewAllEmployeesByDepartment = () => {
@@ -93,28 +113,29 @@ const viewAllEmployeesByDepartment = () => {
     });
 };
 
+const viewAllEmployeesByRole = () => {
+  inquirer
+    .prompt(
+      {
+        name: "role",
+        type: "list",
+        message: "What employee roles would you like to view?",
+        choices: roleNames
+      }, 
+    ).then(function (answer) {
+      // console.log(answer)
+      const query = `SELECT employee.id, employee.first_name, employee.last_name, role.title, department.department FROM employee INNER JOIN role ON employee.role_id = role.id INNER JOIN department ON role.department_id = department.id WHERE role.title = ?;`
+      connection.query(query, answer.role, (err,res) => {
+        if (err) throw err
+        console.table(res)
+        employeeTracker()
+      })
+    })
+}
+
 const viewAllEmployeesByManager = [{}];
 
 
-//!------------------------------------------
-
-//! Review this to better understand it 
-let roleNames;
-let roleIds;
-var arrayOfRoles = {};
-
-connection.query("SELECT * FROM role", (err, res) => {
-  if (err) throw err;
-
-  roleNames = res.map((x) => x.title);
-  roleIds = res.map((x) => x.id);
-  for (var i = 0; i < roleNames.length; i++) {
-    arrayOfRoles[roleNames[i]] = roleIds[i];
-  }
-  // console.log(roleNames, roleIds, arrayOfRoles)
-});
-
-//!------------------------------------------
 
 
 const addEmployee = () => {
@@ -148,11 +169,6 @@ const addEmployee = () => {
     })
 };
 
-const removeEmployee = [{}];
-
-const updateEmployeeRole = [{}];
-
-const updateEmployeeManager = [{}];
 
 const employeeTracker = () => {
   inquirer.prompt(startApp).then((answer) => {
@@ -163,6 +179,9 @@ const employeeTracker = () => {
         break;
       case "View All Employees By Department":
         viewAllEmployeesByDepartment();
+        break;
+      case "View All Employees By Role":
+        viewAllEmployeesByRole()
         break;
       case "View All Employees By Manager":
         // console.log("View All Employees By Manager")
