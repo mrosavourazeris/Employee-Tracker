@@ -16,13 +16,30 @@ const startApp = [
     type: "list",
     message: "What would you like to do?",
     choices: [
-      "View All Employees",
+      // Complete
       "View All Employees By Department",
-      "View All Employees By Manager",
+      //TODO
+      "View All Employees By Role",
+      // Complete
+      "View All Employees",
+      //TODO
+      "Add Department",
+      //TODO
+      "Add Role",
+      // Complete
       "Add Employee",
-      "Remove Employee",
+      //TODO
       "Update Employee Role",
+      //TODO: Bonus
+      "View All Employees By Manager",
+      //TODO: Bonus
+      "Remove Employee",
+      //TODO: Bonus
       "Update Employee Manager",
+      //TODO: Bonus
+      "Remove Department",
+      //TODO: Bonus
+      "Remove Role",
     ],
   },
 ];
