@@ -78,6 +78,19 @@ const viewAllEmployeesByDepartment = () => {
 
 const viewAllEmployeesByManager = [{}];
 
+
+let roleId;
+let nextRoleId;
+connection.query("SELECT * FROM role", (err, res) => {
+  if (err) throw err;
+  roleId = res.map((x) => x.id);
+  // console.log(roleId)
+
+  nextRoleId = roleId.length + 1
+
+});
+
+
 const addEmployee = () => {
   inquirer
     .prompt([
@@ -112,13 +125,8 @@ const addEmployee = () => {
         type: "input",
         message: "What is the employee's last name?",
       },
-      {
-        name: "roleId",
-        type: "input",
-        message: "What is the employee's role id?",
-      },
     ])
-    .then(({ department, title, salary, firstName, lastName, roleId }) => {
+    .then(({ department, title, salary, firstName, lastName }) => {
       // console.log(typeof department)
       // console.log(departmentId)
       // console.log(title)
@@ -126,7 +134,8 @@ const addEmployee = () => {
       // console.log(firstName)
       // console.log(lastName)
       // console.log(roleId)
-
+      
+      console.log(nextRoleId)
       let departmentData;
       let departmentId = arrayOfObject[department];
 
