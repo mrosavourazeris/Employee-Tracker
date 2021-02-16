@@ -41,7 +41,7 @@ const viewAllEmployees = () => {
 //! Review this to better understand it 
 let departmentNames;
 let departmentIds;
-var arrayOfObject = {};
+var arrayOfDepartments = {};
 
 connection.query("SELECT * FROM department", (err, res) => {
   if (err) throw err;
@@ -49,9 +49,27 @@ connection.query("SELECT * FROM department", (err, res) => {
   departmentNames = res.map((x) => x.department);
   departmentIds = res.map((x) => x.id);
   for (var i = 0; i < departmentNames.length; i++) {
-    arrayOfObject[departmentNames[i]] = departmentIds[i];
+    arrayOfDepartments[departmentNames[i]] = departmentIds[i];
   }
 });
+//!------------------------------------------
+
+//! Review this to better understand it 
+let roleNames;
+let roleIds;
+var arrayOfRoles = {};
+
+connection.query("SELECT * FROM role", (err, res) => {
+  if (err) throw err;
+
+  roleNames = res.map((x) => x.title);
+  roleIds = res.map((x) => x.id);
+  for (var i = 0; i < roleNames.length; i++) {
+    arrayOfRoles[roleNames[i]] = roleIds[i];
+  }
+  // console.log(roleNames, roleIds, arrayOfRoles)
+});
+
 //!------------------------------------------
 
 const viewAllEmployeesByDepartment = () => {
@@ -100,20 +118,11 @@ const addEmployee = () => {
         message: "Which department does this employee belong too?",
         choices: departmentNames
       },
-      // {
-      //   name: "departmentId",
-      //   type: "input",
-      //   message: "What is the department id?"
-      // },
       {
         name: "title",
-        type: "input",
+        type: "list",
         message: "What is the employee's title?",
-      },
-      {
-        name: "salary",
-        type: "input",
-        message: "What is the employee's salary?",
+        choices: roleNames
       },
       {
         name: "firstName",
@@ -129,35 +138,31 @@ const addEmployee = () => {
     .then(({ department, title, salary, firstName, lastName }) => {
       // console.log(typeof department)
       // console.log(departmentId)
-      // console.log(title)
-      // console.log(salary)
+      // console.log(typeof title, title)
+      // console.log(typeof salary, salary)
       // console.log(firstName)
       // console.log(lastName)
-      // console.log(roleId)
-      
-      console.log(nextRoleId)
+      // console.log(nextRoleId)
+
       let departmentData;
-      let departmentId = arrayOfObject[department];
-
+      let departmentId = arrayOfDepartments[department];
+      let roleId = arrayOfRoles[title]
+      // console.log(typeof departmentId, departmentId, "departmentId")
      
-      // console.log(departmentData,departmentId)
+      // console.log(arrayOfDepartments, department)
 
-      // const query1 = `INSERT INTO department(department) VALUES ?;`
-      // const query2 = `INSERT INTO role(title, salary, department_id) VALUES ?;`
-      // const query3 = `INSERT INTO employee (first_name, last_name, role_id) VALUES ?;`
-      // connection.query(query1, department, (err,res) => {
+      
+      // const query1 = `INSERT INTO role(title, salary, department_id) VALUES ?`
+      const query2 = `INSERT INTO employee (first_name, last_name, role_id) VALUES ?`
+  
+      // connection.query(query1, [[[salary, departmentId]]], (err,res) => {
       //   if (err) throw err
-      //   console.table(res)
-      // connection.query(query2, ({title, salary, departmentId}), (err,res) => {
-      //   if (err) throw err
-      //   connection.query(query3, ({firstName, lastName, roleId}), (err,res) => {
-      //     if (err) throw err
-      //     console.table(res)
-      //     employeeTracker()
-      //   })
       // })
-      // })
-    });
+      connection.query(query2, [[[firstName, lastName, roleId]]], (err,res) => {
+        if (err) throw err
+        viewAllEmployees()
+      })
+    })
 };
 
 const removeEmployee = [{}];
