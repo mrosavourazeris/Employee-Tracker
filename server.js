@@ -58,7 +58,7 @@ const startApp = [
       "View All Employees",
       //Complete
       "Add Department",
-      //TODO
+      //Complete
       "Add Role",
       //Complete
       "Add Employee",
@@ -149,9 +149,9 @@ const addDepartment = () => {
 
 const addRole = () => {
   inquirer
-  .prompt(
+  .prompt([
     {
-      name: "pickDepartment",
+      name: "department",
       type: "list",
       message: "Which department is this role part of?",
       choices: departmentNames
@@ -166,7 +166,15 @@ const addRole = () => {
       type: "number",
       message: "What is the yearly salary for this role?"
     }
-  ).then
+  ]).then(({department, newRole, salary}) => {
+    let departmentIds = arrayOfDepartments[department]
+    const query = `INSERT INTO role(title, salary, department_id) VALUES ?`
+    connection.query(query, [[[newRole,salary,departmentIds]]], (err,res) => {
+      if (err) throw err
+      console.table(res)
+      employeeTracker()
+    })
+  })
 
 }
 
@@ -222,6 +230,9 @@ const employeeTracker = () => {
         break;
       case "Add Department":
         addDepartment()
+        break;
+      case "Add Role":
+        addRole()
         break;
       case "Add Employee":
         addEmployee();
