@@ -1,6 +1,6 @@
 const mysql = require("mysql");
 const inquirer = require("inquirer");
-// const cTable = require("console.table")
+const updateRoleQuery = `UPDATE employee SET role_id = (?) WHERE id = (?)`
 
 var connection = mysql.createConnection({
   host: "localhost",
@@ -211,6 +211,66 @@ const addEmployee = () => {
     })
 };
 
+//!------------------------------------------
+
+//! Review this to better understand it 
+let employeeFullNames;
+let employeeIds;
+var arrayOfEmployees = {};
+
+connection.query("SELECT * FROM employee", (err, res) => {
+  if (err) throw err;
+
+  employeeFullNames = res.map((x) => (x.first_name + " " + x.last_name));
+  employeeIds = res.map((x) => x.id);
+  for (var i = 0; i < employeeFullNames.length; i++) {
+    arrayOfEmployees[employeeFullNames[i]] = employeeIds[i];
+  }
+  // console.log(roleNames, roleIds, arrayOfRoles)
+});
+
+//!------------------------------------------
+
+
+
+const updateEmployeeRole = () => {
+  inquirer
+  .prompt(
+    [
+      {
+        name: "employeeName",
+        type: "list",
+        message: "Which employee's role would you like to update?",
+        choices: employeeFullNames
+      },
+      {
+        name: "updateRole",
+        type: "list",
+        message: "What is the employee's new role?",
+        choices: roleNames
+      }
+    ]
+  ).then(({employeeName, updateRole}) => {
+    let newRoleId = arrayOfRoles[updateRole]
+    let newEmployeeId = (arrayOfEmployees[employeeName])
+    // console.log(updateRoleQuery)
+    // console.log(newRoleId)
+    // console.log(newEmployeeId)
+    
+    // connection.query(`SELECT * FROM employee;`, (err,res) => {
+    //   if (err) throw err
+    //   console.table(res)
+    // })
+
+    connection.query(`UPDATE employee SET role_id = ?, WHERE id = ?;`, [[newRoleId], [newEmployeeId]], (err, res) => {
+      if (err) throw err
+      // console.table(res)
+      viewAllEmployees()
+      employeeTracker()
+    })
+  })
+}
+
 
 const employeeTracker = () => {
   inquirer.prompt(startApp).then((answer) => {
@@ -236,6 +296,9 @@ const employeeTracker = () => {
         break;
       case "Add Employee":
         addEmployee();
+        break;
+      case "Update Employee Role":
+        updateEmployeeRole();
         break;
       case "Remove Employee":
         // console.log("Remove Employee")
