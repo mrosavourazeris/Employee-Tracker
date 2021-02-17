@@ -50,17 +50,17 @@ const startApp = [
     type: "list",
     message: "What would you like to do?",
     choices: [
-      // Complete
+      //Complete
       "View All Employees By Department",
-      //TODO
+      //Complete
       "View All Employees By Role",
-      // Complete
+      //Complete
       "View All Employees",
-      //TODO
+      //Complete
       "Add Department",
       //TODO
       "Add Role",
-      // Complete
+      //Complete
       "Add Employee",
       //TODO
       "Update Employee Role",
@@ -78,27 +78,13 @@ const startApp = [
   },
 ];
 
-const viewAllEmployees = () => {
-  connection.query(
-    `SELECT employee.id, employee.first_name, employee.last_name, role.title, department.department, role.salary FROM employee INNER JOIN role ON employee.role_id = role.id INNER JOIN department ON role.department_id = department.id;`,
-    (err, res) => {
-      if (err) throw err;
-      console.table(res);
-      employeeTracker();
-    }
-  );
-};
-
-
-
 const viewAllEmployeesByDepartment = () => {
-
   inquirer
     .prompt({
       name: "department",
       type: "list",
       message: "Which department would you like to view?",
-      choices: departmentNames
+      choices: departmentNames,
     })
     .then(function (answer) {
       // storeAllDepartments()
@@ -112,30 +98,53 @@ const viewAllEmployeesByDepartment = () => {
       });
     });
 };
-
 const viewAllEmployeesByRole = () => {
   inquirer
-    .prompt(
-      {
-        name: "role",
-        type: "list",
-        message: "What employee roles would you like to view?",
-        choices: roleNames
-      }, 
-    ).then(function (answer) {
-      // console.log(answer)
-      const query = `SELECT employee.id, employee.first_name, employee.last_name, role.title, department.department FROM employee INNER JOIN role ON employee.role_id = role.id INNER JOIN department ON role.department_id = department.id WHERE role.title = ?;`
-      connection.query(query, answer.role, (err,res) => {
-        if (err) throw err
-        console.table(res)
-        employeeTracker()
-      })
+    .prompt({
+      name: "role",
+      type: "list",
+      message: "What employee roles would you like to view?",
+      choices: roleNames,
     })
+    .then(function (answer) {
+      // console.log(answer)
+      const query = `SELECT employee.id, employee.first_name, employee.last_name, role.title, department.department FROM employee INNER JOIN role ON employee.role_id = role.id INNER JOIN department ON role.department_id = department.id WHERE role.title = ?;`;
+      connection.query(query, answer.role, (err, res) => {
+        if (err) throw err;
+        console.table(res);
+        employeeTracker();
+      });
+    });
+};
+const viewAllEmployees = () => {
+  connection.query(
+    `SELECT employee.id, employee.first_name, employee.last_name, role.title, department.department, role.salary FROM employee INNER JOIN role ON employee.role_id = role.id INNER JOIN department ON role.department_id = department.id;`,
+    (err, res) => {
+      if (err) throw err;
+      console.table(res);
+      employeeTracker();
+    }
+  );
+};
+
+const addDepartment = () => {
+  inquirer
+  .prompt(
+    {
+      name: "newDepartment",
+      type: "input",
+      message: "What department would you like to add?"
+    },
+  ).then((answer) => {
+    // console.log(answer.department)
+    const query = `INSERT INTO department (department) VALUES (?)`
+    connection.query(query, answer.newDepartment, (err,res) => {
+      if (err) throw err
+      console.table(res)
+      employeeTracker()
+    })
+  })
 }
-
-const viewAllEmployeesByManager = [{}];
-
-
 
 
 const addEmployee = () => {
@@ -165,6 +174,7 @@ const addEmployee = () => {
       connection.query(query1, [[[firstName, lastName, roleId]]], (err,res) => {
         if (err) throw err
         viewAllEmployees()
+        employeeTracker()
       })
     })
 };
@@ -185,6 +195,9 @@ const employeeTracker = () => {
         break;
       case "View All Employees By Manager":
         // console.log("View All Employees By Manager")
+        break;
+      case "Add Department":
+        addDepartment()
         break;
       case "Add Employee":
         addEmployee();
