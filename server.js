@@ -116,6 +116,7 @@ const viewAllEmployeesByRole = () => {
       });
     });
 };
+
 const viewAllEmployees = () => {
   connection.query(
     `SELECT employee.id, employee.first_name, employee.last_name, role.title, department.department, role.salary FROM employee INNER JOIN role ON employee.role_id = role.id INNER JOIN department ON role.department_id = department.id;`,
@@ -144,6 +145,29 @@ const addDepartment = () => {
       employeeTracker()
     })
   })
+};
+
+const addRole = () => {
+  inquirer
+  .prompt(
+    {
+      name: "pickDepartment",
+      type: "list",
+      message: "Which department is this role part of?",
+      choices: departmentNames
+    },
+    {
+      name: "newRole",
+      type: "input",
+      message: "What is the role you would like to add?"
+    },
+    {
+      name: "salary",
+      type: "number",
+      message: "What is the yearly salary for this role?"
+    }
+  ).then
+
 }
 
 
