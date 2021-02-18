@@ -9,74 +9,67 @@ var connection = mysql.createConnection({
   database: "employees_db",
 });
 
+//!------------------------------------------
+
 //! Review this to better understand it 
 let departmentNames;
 let departmentIds;
-var arrayOfDepartments = {};
+let arrayOfDepartments = {};
 
-connection.query("SELECT * FROM department", (err, res) => {
-  if (err) throw err;
-  
-  departmentNames = res.map((x) => x.department);
-  departmentIds = res.map((x) => x.id);
-  for (var i = 0; i < departmentNames.length; i++) {
-    arrayOfDepartments[departmentNames[i]] = departmentIds[i];
-  }
-});
+
 
 //!------------------------------------------
 
 //! Review this to better understand it 
 let roleNames;
 let roleIds;
-var arrayOfRoles = {};
+let arrayOfRoles = {};
 
-connection.query("SELECT * FROM role", (err, res) => {
-  if (err) throw err;
 
-  roleNames = res.map((x) => x.title);
-  roleIds = res.map((x) => x.id);
-  for (var i = 0; i < roleNames.length; i++) {
-    arrayOfRoles[roleNames[i]] = roleIds[i];
-  }
-  // console.log(roleNames, roleIds, arrayOfRoles)
-});
 
 //!------------------------------------------
 
-const startApp = [
-  {
-    name: "action",
-    type: "list",
-    message: "What would you like to do?",
-    choices: [
-      //Complete
-      "View All Employees By Department",
-      //Complete
-      "View All Employees By Role",
-      //Complete
-      "View All Employees",
-      //Complete
-      "Add Department",
-      //Complete
-      "Add Role",
-      //Complete
-      "Add Employee",
-      //TODO
-      "Update Employee Role",
-      //TODO: Bonus
-      "View All Employees By Manager",
-      //TODO: Bonus
-      "Remove Employee",
-      //TODO: Bonus
-      "Update Employee Manager",
-      //TODO: Bonus
-      "Remove Department",
-      //TODO: Bonus
-      "Remove Role",
-    ],
-  },
-];
+//! Review this to better understand it 
+let employeeFullNames;
+let employeeIds;
+let arrayOfEmployees = {};
+
+
+
+//!------------------------------------------
+
+
+let startUpQuery = () => {
+  connection.query("SELECT * FROM department", (err, res) => {
+    if (err) throw err;
+    
+    departmentNames = res.map((x) => x.department);
+    departmentIds = res.map((x) => x.id);
+    for (var i = 0; i < departmentNames.length; i++) {
+      arrayOfDepartments[departmentNames[i]] = departmentIds[i];
+    }
+  });
+  connection.query("SELECT * FROM role", (err, res) => {
+    if (err) throw err;
+  
+    roleNames = res.map((x) => x.title);
+    roleIds = res.map((x) => x.id);
+    for (var i = 0; i < roleNames.length; i++) {
+      arrayOfRoles[roleNames[i]] = roleIds[i];
+    }
+    // console.log(roleNames, roleIds, arrayOfRoles)
+  });
+  connection.query("SELECT * FROM employee", (err, res) => {
+    if (err) throw err;
+  
+    employeeFullNames = res.map((x) => (x.first_name + " " + x.last_name));
+    employeeIds = res.map((x) => x.id);
+    for (var i = 0; i < employeeFullNames.length; i++) {
+      arrayOfEmployees[employeeFullNames[i]] = employeeIds[i];
+    }
+    // console.log(roleNames, roleIds, arrayOfRoles)
+  });
+}
 
 const viewAllEmployeesByDepartment = () => {
   inquirer
@@ -90,8 +83,7 @@ const viewAllEmployeesByDepartment = () => {
       // storeAllDepartments()
 
       // console.log(answer.department)
-      const query = `SELECT employee.id, employee.first_name, employee.last_name, role.title, department.department FROM employee INNER JOIN role ON employee.role_id = role.id INNER JOIN department ON role.department_id = department.id WHERE department.department = ?;`;
-      connection.query(query, answer.department, (err, res) => {
+      connection.query(`SELECT employee.id, employee.first_name, employee.last_name, role.title, department.department FROM employee INNER JOIN role ON employee.role_id = role.id INNER JOIN department ON role.department_id = department.id WHERE department.department = ?;`, answer.department, (err, res) => {
         if (err) throw err;
         console.table(res);
         employeeTracker();
@@ -108,8 +100,7 @@ const viewAllEmployeesByRole = () => {
     })
     .then(function (answer) {
       // console.log(answer)
-      const query = `SELECT employee.id, employee.first_name, employee.last_name, role.title, department.department FROM employee INNER JOIN role ON employee.role_id = role.id INNER JOIN department ON role.department_id = department.id WHERE role.title = ?;`;
-      connection.query(query, answer.role, (err, res) => {
+      connection.query(`SELECT employee.id, employee.first_name, employee.last_name, role.title, department.department FROM employee INNER JOIN role ON employee.role_id = role.id INNER JOIN department ON role.department_id = department.id WHERE role.title = ?;`, answer.role, (err, res) => {
         if (err) throw err;
         console.table(res);
         employeeTracker();
@@ -138,10 +129,9 @@ const addDepartment = () => {
     },
   ).then((answer) => {
     // console.log(answer.department)
-    const query = `INSERT INTO department (department) VALUES (?)`
-    connection.query(query, answer.newDepartment, (err,res) => {
+    connection.query(`INSERT INTO department (department) VALUES (?)`, answer.newDepartment, (err,res) => {
       if (err) throw err
-      console.table(res)
+      // viewAllEmployees()
       employeeTracker()
     })
   })
@@ -168,10 +158,9 @@ const addRole = () => {
     }
   ]).then(({department, newRole, salary}) => {
     let departmentIds = arrayOfDepartments[department]
-    const query = `INSERT INTO role(title, salary, department_id) VALUES ?`
-    connection.query(query, [[[newRole,salary,departmentIds]]], (err,res) => {
+    connection.query(`INSERT INTO role(title, salary, department_id) VALUES ?`, [[[newRole,salary,departmentIds]]], (err,res) => {
       if (err) throw err
-      console.table(res)
+      // viewAllEmployees()
       employeeTracker()
     })
   })
@@ -201,35 +190,16 @@ const addEmployee = () => {
     ])
     .then(({title, firstName, lastName }) => {
       let roleId = arrayOfRoles[title]
-      const query1 = `INSERT INTO employee (first_name, last_name, role_id) VALUES ?`
   
-      connection.query(query1, [[[firstName, lastName, roleId]]], (err,res) => {
+      connection.query(`INSERT INTO employee (first_name, last_name, role_id) VALUES ?`, [[[firstName, lastName, roleId]]], (err,res) => {
         if (err) throw err
-        viewAllEmployees()
+        // viewAllEmployees()
         employeeTracker()
       })
     })
 };
 
-//!------------------------------------------
 
-//! Review this to better understand it 
-let employeeFullNames;
-let employeeIds;
-var arrayOfEmployees = {};
-
-connection.query("SELECT * FROM employee", (err, res) => {
-  if (err) throw err;
-
-  employeeFullNames = res.map((x) => (x.first_name + " " + x.last_name));
-  employeeIds = res.map((x) => x.id);
-  for (var i = 0; i < employeeFullNames.length; i++) {
-    arrayOfEmployees[employeeFullNames[i]] = employeeIds[i];
-  }
-  // console.log(roleNames, roleIds, arrayOfRoles)
-});
-
-//!------------------------------------------
 
 
 
@@ -262,10 +232,10 @@ const updateEmployeeRole = () => {
     //   console.table(res)
     // })
 
-    connection.query(`UPDATE employee SET role_id = ?, WHERE id = ?;`, [[newRoleId], [newEmployeeId]], (err, res) => {
+    connection.query(`UPDATE employee SET role_id = ? WHERE id = ?;`, [[newRoleId], [newEmployeeId]], (err, res) => {
       if (err) throw err
       // console.table(res)
-      viewAllEmployees()
+      // viewAllEmployees()
       employeeTracker()
     })
   })
@@ -273,7 +243,41 @@ const updateEmployeeRole = () => {
 
 
 const employeeTracker = () => {
-  inquirer.prompt(startApp).then((answer) => {
+  startUpQuery()
+  inquirer
+  .prompt(
+    {
+      name: "action",
+      type: "list",
+      message: "What would you like to do?",
+      choices: [
+        //Complete
+        "View All Employees By Department",
+        //Complete
+        "View All Employees By Role",
+        //Complete
+        "View All Employees",
+        //Complete
+        "Add Department",
+        //Complete
+        "Add Role",
+        //Complete
+        "Add Employee",
+        //TODO
+        "Update Employee Role",
+        // //TODO: Bonus
+        // "View All Employees By Manager",
+        // //TODO: Bonus
+        // "Remove Employee",
+        // //TODO: Bonus
+        // "Update Employee Manager",
+        // //TODO: Bonus
+        // "Remove Department",
+        // //TODO: Bonus
+        // "Remove Role",
+      ],
+    },
+  ).then((answer) => {
     // console.log(answer)
     switch (answer.action) {
       case "View All Employees":
