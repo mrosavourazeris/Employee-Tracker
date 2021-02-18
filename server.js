@@ -218,16 +218,17 @@ const employeeTracker = () => {
         "Add Role",
         //Complete
         "Add Employee",
-        //Complete
-        "Update Employee Role",
-        //TODO: Bonus
-        // "Remove Employee",
-        //TODO: Bonus
-        // "Update Employee Manager",
         //TODO: Bonus
         // "Remove Department",
         //TODO: Bonus
         // "Remove Role",
+        //TODO: Bonus
+        // "Remove Employee",
+        //Complete
+        "Update Employee Role",
+        //TODO: Bonus
+        // "Update Employee Manager",
+        // "End App"
       ],
     },
   ).then((answer) => {
@@ -254,18 +255,24 @@ const employeeTracker = () => {
       case "Add Employee":
         addEmployee();
         break;
+      // case "Remove Department":
+      //   removeDepartment()
+      //   break;
+      // case "Remove Role":
+      //   removeRole()
+      //   break;
+      // case "Remove Employee":
+      //   removeEmployee()
+      //   break;
       case "Update Employee Role":
         updateEmployeeRole();
         break;
-      case "Remove Employee":
-        removeEmployee()
-        break;
-      case "Update Employee Role":
-        // console.log("Update Employee Role")
-        break;
-      case "Update Employee Manager":
-        // console.log("Update Employee Manager")
-        break;
+      // case "Update Employee Manager":
+      //   updateManager()
+      //   break;
+      // case "End App":
+      //   return "^C"
+        
     }
   });
 };
